@@ -13,6 +13,13 @@ public class GestionNotasAlumnos {
   public static void main(String[] args) {
     int opcion;
 
+    menu();
+
+    scanner.close();
+  }
+
+  private static void menu() {
+    int opcion;
     do {
       System.out.println("----- MENÚ DE GESTIÓN DE NOTAS -----");
       System.out.println("1. Dar de Alta Alumno");
@@ -32,7 +39,7 @@ public class GestionNotasAlumnos {
 
       switch (opcion) {
         case 1:
-          darDeAltaAlumno();
+          DAOAlumno.darDeAltaAlumno();
           break;
         case 2:
           darDeBajaAlumno();
@@ -52,52 +59,8 @@ public class GestionNotasAlumnos {
       System.out.println("\nPresione Enter para continuar...");
       scanner.nextLine(); // Consumir el salto de línea pendiente
     } while (opcion != 5);
-
-    scanner.close();
   }
 
-
-
-
-  private static void darDeAltaAlumno() {
-    System.out.println("\n--- DAR DE ALTA ALUMNO ---");
-    System.out.print("Ingrese el nombre del alumno: ");
-    String nombre = scanner.nextLine();
-
-    // Verificar si el alumno ya existe
-    if (buscarAlumnoPorNombre(nombre) != null) {
-      System.out.println("Error: Ya existe un alumno con ese nombre.");
-      return;
-    }
-
-    Alumno nuevoAlumno = new Alumno(nombre);
-    listaAlumnos.add(nuevoAlumno);
-
-    boolean agregarMasNotas = true;
-    while (agregarMasNotas) {
-      System.out.print("¿Desea agregar una nota para " + nombre + "? (s/n): ");
-      String respuesta = scanner.nextLine().toLowerCase();
-      if (respuesta.equals("s")) {
-        try {
-          System.out.print("Ingrese la nota (0-10): ");
-          int nota = scanner.nextInt();
-          scanner.nextLine(); // Consumir el salto de línea
-          if (nota >= 0 && nota <= 10) {
-            nuevoAlumno.agregarNota(nota);
-          } else {
-            System.out.println("La nota debe estar entre 0 y 10.");
-          }
-        } catch (InputMismatchException e) {
-          System.out.println("Entrada inválida. Por favor, ingrese un número para la nota.");
-          scanner.nextLine(); // Consumir la entrada errónea
-        }
-      } else {
-        agregarMasNotas = false;
-      }
-    }
-
-    System.out.println("Alumno " + nombre + " dado de alta exitosamente.");
-  }
 
   private static void darDeBajaAlumno() {
     System.out.println("\n--- DAR DE BAJA ALUMNO ---");
@@ -109,7 +72,7 @@ public class GestionNotasAlumnos {
     System.out.print("Ingrese el nombre del alumno a dar de baja: ");
     String nombre = scanner.nextLine();
 
-    Alumno alumnoABorrar = buscarAlumnoPorNombre(nombre);
+    Alumno alumnoABorrar = DAOAlumno.buscarAlumnoPorNombre(nombre);
 
     if (alumnoABorrar != null) {
       listaAlumnos.remove(alumnoABorrar);
@@ -129,7 +92,7 @@ public class GestionNotasAlumnos {
     System.out.print("Ingrese el nombre del alumno a modificar: ");
     String nombre = scanner.nextLine();
 
-    Alumno alumnoAModificar = buscarAlumnoPorNombre(nombre);
+    Alumno alumnoAModificar = DAOAlumno.buscarAlumnoPorNombre(nombre);
 
     if (alumnoAModificar != null) {
       System.out.println("Alumno encontrado: " + alumnoAModificar);
@@ -153,7 +116,7 @@ public class GestionNotasAlumnos {
           System.out.print("Ingrese el nuevo nombre para " + alumnoAModificar.getNombre() + ": ");
           String nuevoNombre = scanner.nextLine();
           // Verificar que el nuevo nombre no exista ya
-          if (buscarAlumnoPorNombre(nuevoNombre) != null && !nuevoNombre.equalsIgnoreCase(alumnoAModificar.getNombre())) {
+          if (DAOAlumno.buscarAlumnoPorNombre(nuevoNombre) != null && !nuevoNombre.equalsIgnoreCase(alumnoAModificar.getNombre())) {
             System.out.println("Error: Ya existe un alumno con ese nombre.");
           } else {
             alumnoAModificar.setNombre(nuevoNombre);
@@ -260,13 +223,4 @@ public class GestionNotasAlumnos {
     }
   }
 
-  // Método auxiliar para buscar un alumno por nombre (ignora mayúsculas/minúsculas)
-  private static Alumno buscarAlumnoPorNombre(String nombre) {
-    for (Alumno alumno : listaAlumnos) {
-      if (alumno.getNombre().equalsIgnoreCase(nombre)) {
-        return alumno;
-      }
-    }
-    return null;
-  }
 }
